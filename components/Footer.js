@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFacebook, faTwitter, faGithub, faInstagram, faLinkedin } from "@fortawesome/free-brands-svg-icons";
+import { faGithub, faLinkedin, faGitlab } from "@fortawesome/free-brands-svg-icons";
 
 
 const Footer = () => {
@@ -9,27 +9,16 @@ const Footer = () => {
                 <section >
                     <a
                         className="btn btn-floating m-1 link-primary"
-                        href="#!"
+                        href="https://gitlab.com/mariadasanton27"
+                        target="_blank"
                         role="button"
-                    ><FontAwesomeIcon icon={faFacebook} size="2x" /></a>
-
-                    <a
-                        className="btn btn-floating m-1 link-primary"
-                        href="#!"
-                        role="button"
-                    ><FontAwesomeIcon icon={faInstagram} size="2x" />
-                    </a>
-
-                    <a
-                        className="btn btn-floating m-1 link-primary"
-                        href="#!"
-                        role="button"
-                    ><FontAwesomeIcon icon={faTwitter} size="2x" />
+                    ><FontAwesomeIcon icon={faGitlab} size="2x" />
                     </a>
 
                     <a
                         className="btn btn-floating m-1 link-primary"
                         href="https://github.com/AntonMariadas/"
+                        target="_blank"
                         role="button"
                     ><FontAwesomeIcon icon={faGithub} size="2x" />
                     </a>
@@ -37,12 +26,13 @@ const Footer = () => {
                     <a
                         className="btn btn-floating m-1 link-primary"
                         href="https://www.linkedin.com/in/anton-m-172a161b0/"
+                        target="_blank"
                         role="button"
                     ><FontAwesomeIcon icon={faLinkedin} size="2x" />
                     </a>
                 </section>
 
-                <section className="text-white">2022 © MyITJob - Mentions légales
+                <section className="text-white">{new Date().getFullYear()} © MyITJob - Mentions légales
                 </section>
             </div>
         </footer>

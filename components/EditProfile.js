@@ -1,18 +1,31 @@
-import axios from 'axios';
 import Head from 'next/head';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import AuthContext from '../context/AuthContext';
+import { useState, useContext } from 'react';
+import axios from 'axios';
 import SuccessModal from '../components/SuccessModal';
 import FailureModal from '../components/FailureModal';
 
 
-const inscription = () => {
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [showFailureModal, setShowFailureModal] = useState(false);
-    const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
+
+const EditProfile = () => {
     const springBootApi = process.env.NEXT_PUBLIC_SPRINGBOOT_API;
     const geocodeApiKey = process.env.NEXT_PUBLIC_GEOCODE_API_KEY;
-
+    let authToken = JSON.parse(sessionStorage.getItem("authToken"));
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showFailureModal, setShowFailureModal] = useState(false);
+    const { user, setUser } = useContext(AuthContext);
+    const preloadedValues = {
+        lastName: user.lastName,
+        firstName: user.firstName,
+        profile: user.profile,
+        number: user.number,
+        road: user.road,
+        city: user.city,
+        postCode: user.postCode
+    };
+    const { register, handleSubmit, watch, reset, formState: { errors } } = useForm({ defaultValues: preloadedValues });
+    watch();
 
     const geocodeAddress = async (number, road, postCode, city) => {
         const geocodeUrl = `http://api.positionstack.com/v1/forward?access_key=${geocodeApiKey}&query=${number} ${road} ${postCode} ${city}&country=FR`;
@@ -28,10 +41,10 @@ const inscription = () => {
 
     const registerUser = async (data) => {
         let geocode = await geocodeAddress(data.number, data.road, data.postCode, data.city);
-        let userInfo = {
+        let userNewInfo = {
             firstName: data.firstName,
             lastName: data.lastName,
-            email: data.email,
+            email: user.email,
             password: data.password,
             profile: data.profile,
             number: data.number,
@@ -43,8 +56,14 @@ const inscription = () => {
         };
         reset();
 
-        axios.post(`${springBootApi}/api/v1/accounts/register`, userInfo)
+        axios.put(`${springBootApi}/api/v1/accounts/${user.id}`, userNewInfo, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        })
             .then(() => {
+                localStorage.removeItem("user");
+                localStorage.setItem("user", JSON.stringify(userNewInfo));
+                setUser(userNewInfo);
+
                 setShowSuccessModal(true);
                 setTimeout(() => {
                     setShowSuccessModal(false);
@@ -59,23 +78,19 @@ const inscription = () => {
             });
     };
 
-    return (
-        <>
-            <Head>
-                <title>Inscription</title>
-                <meta name="job informatique" content="inscription" />
-            </Head>
 
+    return (
+        <div>
             <section className="h-100 h-custom gradient-custom-2">
                 <form onSubmit={handleSubmit(registerUser)}>
-                    <div className="container py-5 h-100">
-                        <div className="row d-flex justify-content-center align-items-center h-100 mt-5 mb-5">
+                    <div className="container h-100">
+                        <div className="row d-flex justify-content-center align-items-center h-100 mb-5">
                             <div className="col-12">
                                 <div className="card card-registration card-registration-2" style={{ borderRadius: '15px' }}>
                                     <div className="card-body p-0">
                                         <div className="row g-0">
                                             <div className="col-lg-6">
-                                                <div className="p-5">
+                                                <div className="p-5" style={{ background: 'lavender' }}>
                                                     <h3 className="fw-bold mb-5">Identité</h3>
                                                     <div className="row">
                                                         <div className="col-md-6 mb-4 pb-2">
@@ -97,16 +112,6 @@ const inscription = () => {
                                                                 {errors.firstName && errors.firstName.type == "required" && <span className="badge bg-danger">Le prénom est requis</span>}
                                                                 {errors.firstName && errors.firstName.type == "minLength" && <span className="badge bg-warning">Deux caractères minimum</span>}
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="mb-4 pb-2">
-                                                        <div className="form-outline">
-                                                            <label htmlFor="email">Email</label>
-                                                            <input type="text" id="email" className={`form-control form-control-md ${errors.email ? 'is-invalid' : ''}`}
-                                                                {...register('email', { required: true, pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i })}
-                                                            />
-                                                            {errors.email && errors.email.type == "required" && <span className="badge bg-danger">L'email est requis</span>}
-                                                            {errors.email && errors.email.type == "pattern" && <span className="badge bg-warning">Format incorrect</span>}
                                                         </div>
                                                     </div>
                                                     <div className="mb-4 pb-2">
@@ -148,10 +153,9 @@ const inscription = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="col-lg-6" style={{ borderTopRightRadius: '15px', borderBottomRightRadius: '15px', background: 'lavender' }}>
+                                            <div className="col-lg-6" style={{ borderTopRightRadius: '15px', borderBottomRightRadius: '15px' }}>
                                                 <div className="p-5">
                                                     <h3 className="fw-bold mb-5">Adresse</h3>
-
                                                     <div className="mb-4 pb-2">
                                                         <div className="form-outline form-white">
                                                             <label htmlFor="number">Numéro</label>
@@ -195,25 +199,24 @@ const inscription = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-
                                                     <div className="d-grid gap-2 mt-4">
-                                                        <button className="btn btn-lg btn-primary" type="submit">Envoyer</button>
+                                                        <button className="btn btn-lg btn-primary" type="submit">Modifier</button>
                                                     </div>
-
-                                                    {showSuccessModal && <SuccessModal message="Vous êtes bien inscrit" />}
-                                                    {showFailureModal && <FailureModal message="Erreur lors de l'inscription" />}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                {showSuccessModal && <SuccessModal message="Profil mis à jour !" />}
+                                {showFailureModal && <FailureModal message="Erreur lors de la mise à jour" />}
                             </div>
                         </div>
                     </div>
                 </form>
             </section>
-        </>
+
+        </div>
     );
 };
 
-export default inscription;
+export default EditProfile;
