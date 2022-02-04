@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import AuthContext from "../context/AuthContext";
 import axios from 'axios';
-import Map from '../components/Map';
+import Map from '../components/Map/index';
 import { icon } from "leaflet";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from "@fortawesome/free-solid-svg-icons";

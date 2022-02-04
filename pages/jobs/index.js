@@ -20,8 +20,6 @@ const jobs = () => {
             .catch(err => console.log(err));
     }, []);
 
-
-
     const sortByStarsAsc = () => {
         setJobs(
             jobs.sort((a, b) => {

@@ -21,7 +21,7 @@ const inscription = () => {
             const res = await axios.get(geocodeUrl);
             return res.data;
         }
-        catch (error) {
+        catch (err) {
             console.log(err);
         }
     };
@@ -41,6 +41,8 @@ const inscription = () => {
             latitude: geocode.data[0].latitude,
             longitude: geocode.data[0].longitude
         };
+        console; log('geocode', geocode);
+        console.log(userInfo);
         reset();
 
         axios.post(`${springBootApi}/api/v1/accounts/register`, userInfo)
