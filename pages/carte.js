@@ -1,12 +1,14 @@
 import { useEffect, useState, useContext } from 'react';
 import AuthContext from "../context/AuthContext";
 import axios from 'axios';
-import Map from '../components/Map/index';
-import { icon } from "leaflet";
+import Map from '../components/Map';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import Link from 'next/link';
 import withAuth from '../components/HOC/withAuth';
+import JobMarker from '../components/JobMarker';
+import HighJobMarker from '../components/HighJobMarker';
+import UserMarker from '../components/UserMarker';
 
 
 const carte = () => {
@@ -18,23 +20,11 @@ const carte = () => {
     const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
     const nodeJsApi = process.env.NEXT_PUBLIC_NODEJS_API;
 
-    const JOB_ICON = icon({
-        iconUrl: "/marker.png",
-        iconSize: [36, 36],
-    });
-
-    const USER_ICON = icon({
-        iconUrl: "/user.png",
-        iconSize: [36, 36],
-    });
-
-
     useEffect(() => {
         axios.get(`${nodeJsApi}/api/rome/${user.profile}`)
             .then(res => setJobs(res.data))
             .catch(err => console.log(err));
     }, []);
-
 
     return (
         <div className='my-5 py-5'>
@@ -45,14 +35,30 @@ const carte = () => {
                             url={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}@2x?access_token=${mapboxToken}`}
                             attribution='Map data &copy; <a href=&quot;https://www.openstreetmap.org/&quot;>OpenStreetMap</a> contributors, <a href=&quot;https://creativecommons.org/licenses/by-sa/2.0/&quot;>CC-BY-SA</a>, Imagery &copy; <a href=&quot;https://www.mapbox.com/&quot;>Mapbox</a>'
                         />
-                        <Marker icon={USER_ICON} position={userPosition}>
+                        <UserMarker position={userPosition}>
                             <Popup>
                                 Vous êtes ici !
                             </Popup>
-                        </Marker>
+                        </UserMarker>
                         {jobs.map(job => {
-                            return (
-                                <Marker icon={JOB_ICON} position={[job.lat, job.lon]} key={job._id}>
+                            if (job.stars > 2.5)
+                                return (
+                                    <HighJobMarker position={[job.lat, job.lon]} key={job._id}>
+                                        <Popup>
+                                            {job.name} <br />
+                                            {job.naf_text} <br />
+                                            {job.address} <br />
+                                            {job.headcount_text} <br />
+                                            {job.contact_mode} <br />
+                                            <FontAwesomeIcon icon={faStar} /> {job.stars} <br />
+                                            <Link href={`/jobs/${job._id}`}>
+                                                <a href="" className='text-primary'>Voir l'offre</a>
+                                            </Link>
+                                        </Popup>
+                                    </HighJobMarker>
+                                );
+                            else return (
+                                <Marker position={[job.lat, job.lon]} key={job._id}>
                                     <Popup>
                                         {job.name} <br />
                                         {job.naf_text} <br />
@@ -65,12 +71,17 @@ const carte = () => {
                                         </Link>
                                     </Popup>
                                 </Marker>
-
                             );
                         })}
                     </>
                 )}
             </Map>
+            <div className='text-center'>
+                <h4>Légende</h4>
+                <span className="badge bg-danger rounded-pill">MA POSITION</span>
+                <span className="badge bg-info rounded-pill">JOB</span>
+                <span className="badge bg-primary rounded-pill">JOB BIEN NOTÉ</span>
+            </div>
         </div>
     );
 };

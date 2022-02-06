@@ -42,13 +42,6 @@ const Navbar = () => {
                                 </Link>
                             </li>
                         )}
-                        {isAuthenticated && (
-                            <li className="nav-item">
-                                <Link href="/carte">
-                                    <a className="nav-link">Carte</a>
-                                </Link>
-                            </li>
-                        )}
                         <li className="nav-item">
                             <Link href="/liens">
                                 <a className="nav-link">Liens utiles</a>

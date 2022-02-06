@@ -39,7 +39,7 @@ const administration = () => {
                     <li className="nav-item dropdown">
                         <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Entreprises</a>
                         <div className="dropdown-menu">
-                            <a className="dropdown-item" data-bs-toggle="tab" href="#administration">Administration de système d'information</a>
+                            <a className="dropdown-item" data-bs-toggle="tab" href="#administration">Administration de systèmes d'information</a>
                             <a className="dropdown-item" data-bs-toggle="tab" href="#consultant">Conseil et maîtrise d'ouvrage en systèmes d'information</a>
                             <a className="dropdown-item" data-bs-toggle="tab" href="#defense">Défense et conseil juridique</a>
                             <a className="dropdown-item" data-bs-toggle="tab" href="#direction">Direction des systèmes d'information</a>

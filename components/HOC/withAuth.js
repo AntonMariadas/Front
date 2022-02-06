@@ -6,7 +6,6 @@ const withAuth = (WrappedComponent) => {
     return (props) => {
         const { authToken } = useContext(AuthContext);
 
-        // vérifie si je suis bien coté client
         if (typeof window !== "undefined") {
             const router = useRouter();
 
@@ -18,7 +17,6 @@ const withAuth = (WrappedComponent) => {
             return <WrappedComponent {...props} />;
         }
 
-        // si je suis côté serveur
         return null;
     };
 };

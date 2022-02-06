@@ -25,7 +25,7 @@ const PieChart = () => {
         datasets: [{
             label: "Entreprises par domaine",
             data: [
-                companies.filter(company => company.matched_rome_label === "Administration de système d'information").length,
+                companies.filter(company => company.matched_rome_label === "Administration de systèmes d'information").length,
                 companies.filter(company => company.matched_rome_label === "Conseil et maîtrise d'ouvrage en systèmes d'information").length,
                 companies.filter(company => company.matched_rome_label === "Défense et conseil juridique").length,
                 companies.filter(company => company.matched_rome_label === "Direction des systèmes d'information").length,

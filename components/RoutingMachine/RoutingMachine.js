@@ -9,7 +9,7 @@ const createRoutineMachineLayer = ({ position, start, end, color, collapsible, a
 
     const instance = L.Routing.control({
         // EN PROD UTILISER MAPBOX
-        router: L.Routing.mapbox(mapboxToken),
+        // router: L.Routing.mapbox(mapboxToken),
         position,
         waypoints: [
             start,

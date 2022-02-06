@@ -34,7 +34,7 @@ const EditProfile = () => {
             const res = await axios.get(geocodeUrl);
             return res.data;
         }
-        catch (error) {
+        catch (err) {
             console.log(err);
         }
     };

@@ -5,13 +5,14 @@ import { useEffect, useState, useContext } from 'react';
 import AuthContext from "../../context/AuthContext";
 import { useRouter } from "next/router";
 import axios from 'axios';
-import Map from '../../components/Map/index';
-import RoutingControl from '../../components/RoutingControl/index';
-import { icon } from "leaflet";
+import Map from '../../components/Map';
+import RoutingMachine from '../../components/RoutingMachine';
 import SuccessModal from "../../components/SuccessModal";
 import FailureModal from "../../components/FailureModal";
 import moment from "moment";
 import withAuth from "../../components/HOC/withAuth";
+import JobMarker from "../../components/JobMarker";
+import UserMarker from "../../components/UserMarker";
 
 
 const details = () => {
@@ -20,6 +21,8 @@ const details = () => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showFailureModal, setShowFailureModal] = useState(false);
     const springBootApi = process.env.NEXT_PUBLIC_SPRINGBOOT_API;
+    const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+    const nodeJsApi = process.env.NEXT_PUBLIC_NODEJS_API;
 
     const { user, authToken } = useContext(AuthContext);
     const [job, setJob] = useState({});
@@ -27,26 +30,16 @@ const details = () => {
     const [displayRoute, setDisplayRoute] = useState(false);
 
     const defaultCenter = [48.8566, 2.3522];
-    let jobPosition = [job.lat, job.lon];
-    let userPosition = [user.latitude, user.longitude];
-    const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-    const nodeJsApi = process.env.NEXT_PUBLIC_NODEJS_API;
-
-    const JOB_ICON = icon({
-        iconUrl: "/marker.png",
-        iconSize: [36, 36],
-    });
-
-    const USER_ICON = icon({
-        iconUrl: "/user.png",
-        iconSize: [36, 36],
-    });
+    const [jobPosition, setJobPosition] = useState(defaultCenter);
+    const [userPosition, setUserPosition] = useState(defaultCenter);
 
     useEffect(async () => {
         const res = await axios.get(`${nodeJsApi}/api/companies/${id}`);
         setJob(res.data);
         let perCentage = (res.data.stars) * 20;
         setRating(perCentage);
+        setJobPosition([res.data.lat, res.data.lon]);
+        setUserPosition([user.latitude, user.longitude]);
     }, []);
 
     const addToFavorites = () => {
@@ -97,10 +90,10 @@ const details = () => {
             <div className="py-5">
                 <section className="my-5 d-flex flex-column align-items-center">
                     <Map style={{ width: '100%', height: '31rem' }} center={defaultCenter} zoom={10} scrollWheelZoom={false}>
-                        {({ TileLayer, Marker, Popup }) => (
+                        {({ TileLayer, Marker, Popup, }) => (
                             <>
                                 {displayRoute && (
-                                    <RoutingControl
+                                    <RoutingMachine
                                         position={'topleft'}
                                         start={userPosition}
                                         end={jobPosition}
@@ -114,20 +107,16 @@ const details = () => {
                                     url={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}@2x?access_token=${mapboxToken}`}
                                     attribution='Map data &copy; <a href=&quot;https://www.openstreetmap.org/&quot;>OpenStreetMap</a> contributors, <a href=&quot;https://creativecommons.org/licenses/by-sa/2.0/&quot;>CC-BY-SA</a>, Imagery &copy; <a href=&quot;https://www.mapbox.com/&quot;>Mapbox</a>'
                                 />
-                                {displayRoute && (
-                                    <>
-                                        <Marker icon={JOB_ICON} position={jobPosition}>
-                                            <Popup>
-                                                {job.address}
-                                            </Popup>
-                                        </Marker>
-                                        <Marker icon={USER_ICON} position={userPosition}>
-                                            <Popup>
-                                                Vous êtes ici !
-                                            </Popup>
-                                        </Marker>
-                                    </>
-                                )}
+                                <JobMarker position={jobPosition}>
+                                    <Popup>
+                                        {job.address}
+                                    </Popup>
+                                </JobMarker>
+                                <UserMarker position={userPosition}>
+                                    <Popup>
+                                        Vous êtes ici !
+                                    </Popup>
+                                </UserMarker>
                             </>
                         )}
                     </Map>

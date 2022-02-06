@@ -1,10 +1,11 @@
 import Head from "next/head";
+import Link from "next/link";
 import Card from "../../components/Card";
 import { useEffect, useState, useContext } from 'react';
 import AuthContext from '../../context/AuthContext';
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStarHalfAlt, faStar, faArrowDown, faArrowUp, } from "@fortawesome/free-solid-svg-icons";
+import { faStarHalfAlt, faStar, faArrowDown, faArrowUp, faMapMarkedAlt, faArrowRight, faRedo } from "@fortawesome/free-solid-svg-icons";
 import withAuth from "../../components/HOC/withAuth";
 
 
@@ -53,6 +54,11 @@ const jobs = () => {
                     <button type="button" className="btn btn-outline-warning btn-sm" onClick={sortByStarsDesc}>
                         <FontAwesomeIcon icon={faStarHalfAlt} /> <FontAwesomeIcon icon={faArrowUp} />
                     </button>
+                    <Link href="/carte">
+                        <button type="button" className="btn btn-outline-success btn-sm">
+                            <FontAwesomeIcon icon={faMapMarkedAlt} /> <FontAwesomeIcon icon={faRedo} />
+                        </button>
+                    </Link>
                 </div>
                 <div className="row">
                     {jobs.map((job, index) => {
