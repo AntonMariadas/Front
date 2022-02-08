@@ -1,5 +1,5 @@
 build project:
-  image: node:15
+  image: node:latest
   script:
     - npm install
     - npm build
