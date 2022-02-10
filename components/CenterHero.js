@@ -2,7 +2,7 @@
 const CenterHero = () => {
     return (
         <>
-            <div className="px-4 pt-5 my-5 text-center border-bottom">
+            <div className="px-4 pt-4 my-5 text-center border-bottom">
                 <h1 className="display-4 fw-bold">N'envoyez plus vos CV au hasard</h1>
                 <div className="col-lg-6 mx-auto">
                     <p className="lead mb-4"> <span className="fw-bold">MyItJob</span> vous permet de cibler les entreprises avec un fort potentiel d'embauche pours vos candidatures spontanées dans le domaine informatique.</p>

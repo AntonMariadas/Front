@@ -1,4 +1,3 @@
-import Head from 'next/head';
 import { useForm } from 'react-hook-form';
 import AuthContext from '../context/AuthContext';
 import { useState, useContext } from 'react';
@@ -7,14 +6,15 @@ import SuccessModal from '../components/SuccessModal';
 import FailureModal from '../components/FailureModal';
 
 
-
 const EditProfile = () => {
     const springBootApi = process.env.NEXT_PUBLIC_SPRINGBOOT_API;
     const geocodeApiKey = process.env.NEXT_PUBLIC_GEOCODE_API_KEY;
-    let authToken = JSON.parse(sessionStorage.getItem("authToken"));
+    const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showFailureModal, setShowFailureModal] = useState(false);
-    const { user, setUser } = useContext(AuthContext);
+    const { user, setUser, authToken } = useContext(AuthContext);
+
     const preloadedValues = {
         lastName: user.lastName,
         firstName: user.firstName,
@@ -27,7 +27,18 @@ const EditProfile = () => {
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm({ defaultValues: preloadedValues });
     watch();
 
-    const geocodeAddress = async (number, road, postCode, city) => {
+    const geocodeAddressMapbox = async (number, road, postCode, city) => {
+        const geocodeUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${number} ${road} ${postCode} ${city}.json?country=fr&limit=1&types=place%2Cpostcode%2Caddress&language=fr&access_token=${mapboxToken}`;
+        try {
+            const res = await axios.get(geocodeUrl);
+            return res.data;
+        }
+        catch (err) {
+            console.log(err);
+        }
+    };
+
+    const geocodeAddressPositionstack = async (number, road, postCode, city) => {
         const geocodeUrl = `http://api.positionstack.com/v1/forward?access_key=${geocodeApiKey}&query=${number} ${road} ${postCode} ${city}&country=FR`;
 
         try {
@@ -40,7 +51,7 @@ const EditProfile = () => {
     };
 
     const registerUser = async (data) => {
-        let geocode = await geocodeAddress(data.number, data.road, data.postCode, data.city);
+        let geocode = await geocodeAddressMapbox(data.number, data.road, data.postCode, data.city);
         let userNewInfo = {
             firstName: data.firstName,
             lastName: data.lastName,
@@ -51,8 +62,8 @@ const EditProfile = () => {
             road: data.road,
             postCode: data.postCode,
             city: data.city,
-            latitude: geocode.data[0].latitude,
-            longitude: geocode.data[0].longitude
+            latitude: geocode.features[0].center[1],
+            longitude: geocode.features[0].center[0]
         };
         reset();
 
@@ -60,9 +71,15 @@ const EditProfile = () => {
             headers: { 'Authorization': `Bearer ${authToken}` }
         })
             .then(() => {
+                delete userNewInfo.password;
+                let updatedUser = {
+                    id: user.id,
+                    ...userNewInfo,
+                    role: user.role
+                };
                 localStorage.removeItem("user");
-                localStorage.setItem("user", JSON.stringify(userNewInfo));
-                setUser(userNewInfo);
+                localStorage.setItem("user", JSON.stringify(updatedUser));
+                setUser(updatedUser);
 
                 setShowSuccessModal(true);
                 setTimeout(() => {

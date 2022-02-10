@@ -11,7 +11,6 @@ import SuccessModal from "../../components/SuccessModal";
 import FailureModal from "../../components/FailureModal";
 import moment from "moment";
 import withAuth from "../../components/HOC/withAuth";
-import JobMarker from "../../components/JobMarker";
 import UserMarker from "../../components/UserMarker";
 
 
@@ -103,15 +102,19 @@ const details = () => {
                                         language={'fr'}
                                     />
                                 )}
-                                <TileLayer
+                                {/* <TileLayer
                                     url={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}@2x?access_token=${mapboxToken}`}
                                     attribution='Map data &copy; <a href=&quot;https://www.openstreetmap.org/&quot;>OpenStreetMap</a> contributors, <a href=&quot;https://creativecommons.org/licenses/by-sa/2.0/&quot;>CC-BY-SA</a>, Imagery &copy; <a href=&quot;https://www.mapbox.com/&quot;>Mapbox</a>'
+                                /> */}
+                                <TileLayer
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
-                                <JobMarker position={jobPosition}>
+                                <Marker position={jobPosition}>
                                     <Popup>
                                         {job.address}
                                     </Popup>
-                                </JobMarker>
+                                </Marker>
                                 <UserMarker position={userPosition}>
                                     <Popup>
                                         Vous êtes ici !

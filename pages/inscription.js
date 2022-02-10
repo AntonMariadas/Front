@@ -12,11 +12,22 @@ const inscription = () => {
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
     const springBootApi = process.env.NEXT_PUBLIC_SPRINGBOOT_API;
     const geocodeApiKey = process.env.NEXT_PUBLIC_GEOCODE_API_KEY;
+    const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 
-    const geocodeAddress = async (number, road, postCode, city) => {
+    const geocodeAddressMapbox = async (number, road, postCode, city) => {
+        const geocodeUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${number} ${road} ${postCode} ${city}.json?country=fr&limit=1&types=place%2Cpostcode%2Caddress&language=fr&access_token=${mapboxToken}`;
+        try {
+            const res = await axios.get(geocodeUrl);
+            return res.data;
+        }
+        catch (err) {
+            console.log(err);
+        }
+    };
+
+    const geocodeAddressPositionstack = async (number, road, postCode, city) => {
         const geocodeUrl = `http://api.positionstack.com/v1/forward?access_key=${geocodeApiKey}&query=${number} ${road} ${postCode} ${city}&country=FR`;
-
         try {
             const res = await axios.get(geocodeUrl);
             return res.data;
@@ -27,7 +38,7 @@ const inscription = () => {
     };
 
     const registerUser = async (data) => {
-        let geocode = await geocodeAddress(data.number, data.road, data.postCode, data.city);
+        let geocode = await geocodeAddressMapbox(data.number, data.road, data.postCode, data.city);
         let userInfo = {
             firstName: data.firstName,
             lastName: data.lastName,
@@ -38,11 +49,9 @@ const inscription = () => {
             road: data.road,
             postCode: data.postCode,
             city: data.city,
-            latitude: geocode.data[0].latitude,
-            longitude: geocode.data[0].longitude
+            latitude: geocode.features[0].center[1],
+            longitude: geocode.features[0].center[0]
         };
-        console; log('geocode', geocode);
-        console.log(userInfo);
         reset();
 
         axios.post(`${springBootApi}/api/v1/accounts/register`, userInfo)
